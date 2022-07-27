@@ -7,27 +7,13 @@ const btnEqual = document.querySelector(".equal");
 
 let tabloString = " ";
 let numMathCalc = "";
-let numArray = [];
-let signsArray = [];
 let op = "";
-let switchDelete = "";
 
 function clean() {
   tabloString = " ";
   numMathCalc = "";
-  numArray = [];
-  signsArray = [];
   op = "";
-  switchDelete = "";
   tablo.textContent = "Let's start!";
-}
-
-function addNumToArray() {
-  if (numMathCalc !== "") {
-    numArray.push(+numMathCalc);
-    numMathCalc = "";
-    num = "";
-  }
 }
 
 function updateTabloString(el) {
@@ -35,32 +21,43 @@ function updateTabloString(el) {
   tablo.textContent = tabloString;
 }
 
-function getAnswer() {
-  addNumToArray();
+function deleteOneEl(ElementFrom) {
+  const calcArr = ElementFrom.split("");
+  calcArr.pop();
+  tabloString = calcArr.join("");
+}
 
-  for (let i = 0; i < numArray.length; i++) {
-    switch (signsArray[i]) {
-      case "+":
-        result = numArray[i] + numArray[i + 1];
-        numArray[i + 1] = result;
-        break;
-      case "-":
-        result =
-          numArray[i + 1] < 0
-            ? numArray[i] + numArray[i + 1]
-            : numArray[i] - numArray[i + 1];
-        numArray[i + 1] = result;
-        break;
-      case "x":
-        result = numArray[i] * numArray[i + 1];
-        numArray[i + 1] = result;
-        break;
-      case "/":
-        numArray[i + 1] === 0
-          ? (result = "Impossible :(")
-          : (result = numArray[i] / numArray[i + 1]);
-        numArray[i + 1] = result;
-        break;
+function getAnswer() {
+  const y = numMathCalc.split("#");
+
+  for (let i = 0; i < y.length; i++) {
+    // chek for * or / for the first step and change the array
+    if (y.includes("*") || y.includes("/")) {
+      if (y[i] === "*") {
+        result = y[i - 1] * y[i + 1];
+        y.splice(i - 1, 2);
+        y[i - 1] = result;
+        i = 0;
+      } else if (y[i] === "/") {
+        result = y[i + 1] === "0" ? "no" : y[i - 1] / y[i + 1];
+        y.splice(i - 1, 2);
+        y[i - 1] = result;
+        console.log(y[i]);
+        i = 0;
+      }
+    } else {
+      switch (y[i]) {
+        case "-":
+          result = y[i - 1] - y[i + 1];
+          y.splice(i - 1, 2);
+          y[i - 1] = result;
+          break;
+        case "+":
+          result = Number(y[i - 1]) + Number(y[i + 1]);
+          y.splice(i - 1, 2);
+          y[i - 1] = result;
+          break;
+      }
     }
   }
 
@@ -72,32 +69,14 @@ function getAnswer() {
 btnNum.forEach((el) =>
   el.addEventListener("click", function () {
     updateTabloString(el);
-
-    switchDelete = "addNumber";
-
-    if (op !== "-") {
-      numMathCalc += el.textContent;
-    } else if (numMathCalc < 0) {
-      let x = numMathCalc.toString();
-      x += el.textContent;
-      numMathCalc = Number(x);
-      console.log("work");
-    } else {
-      numMathCalc = -Number(el.textContent);
-    }
+    numMathCalc += el.textContent;
   })
 );
 
 btnMathCalc.forEach((el) =>
   el.addEventListener("click", function () {
+    numMathCalc += "#" + el.textContent + "#";
     updateTabloString(el);
-    addNumToArray();
-
-    switchDelete = "addSign";
-
-    if (tabloString.length > 2) {
-      signsArray.push(el.textContent);
-    }
   })
 );
 
@@ -106,16 +85,11 @@ deleteFull.addEventListener("click", function () {
 });
 
 deleteOne.addEventListener("click", function () {
-  const calcArr = tabloString.split("");
-  calcArr.pop();
-  tabloString = calcArr.join("");
+  deleteOneEl(tabloString);
+
   tablo.textContent = tabloString;
 
-  if (switchDelete === "addNumber") {
-    numMathCalc = +tabloString;
-  } else if (switchDelete === "addSign") {
-    signsArray.pop();
-  }
+  deleteOneEl(numMathCalc);
 });
 
 btnEqual.addEventListener("click", getAnswer);
