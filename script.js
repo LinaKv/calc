@@ -8,12 +8,14 @@ const btnEqual = document.querySelector(".equal");
 let tabloString = " ";
 let numMathCalc = "";
 let op = "";
+let signsOp = "no";
 
 function clean() {
   tabloString = " ";
   numMathCalc = "";
   op = "";
   tablo.textContent = "Let's start!";
+  signsOp = "no";
 }
 
 function updateTabloString(el) {
@@ -21,10 +23,18 @@ function updateTabloString(el) {
   tablo.textContent = tabloString;
 }
 
-function deleteOneEl(ElementFrom) {
-  const calcArr = ElementFrom.split("");
+function deleteOneEl() {
+  const calcArr = tabloString.split("");
   calcArr.pop();
   tabloString = calcArr.join("");
+}
+
+function addOneSign(el) {
+  numMathCalc += "#" + el.textContent + "#";
+}
+
+function deleteOneSign() {
+  numMathCalc = numMathCalc.slice(0, -3);
 }
 
 function getAnswer() {
@@ -70,13 +80,22 @@ btnNum.forEach((el) =>
   el.addEventListener("click", function () {
     updateTabloString(el);
     numMathCalc += el.textContent;
+    signsOp = "yes";
   })
 );
 
 btnMathCalc.forEach((el) =>
   el.addEventListener("click", function () {
-    numMathCalc += "#" + el.textContent + "#";
-    updateTabloString(el);
+    if (signsOp === "yes") {
+      addOneSign(el);
+      updateTabloString(el);
+      signsOp = "no";
+    } else {
+      deleteOneSign();
+      addOneSign(el);
+      deleteOneEl();
+      updateTabloString(el);
+    }
   })
 );
 
@@ -85,11 +104,9 @@ deleteFull.addEventListener("click", function () {
 });
 
 deleteOne.addEventListener("click", function () {
-  deleteOneEl(tabloString);
-
+  deleteOneEl();
   tablo.textContent = tabloString;
-
-  deleteOneEl(numMathCalc);
+  deleteOneSign();
 });
 
 btnEqual.addEventListener("click", getAnswer);
@@ -97,4 +114,16 @@ btnEqual.addEventListener("click", getAnswer);
 document.addEventListener("keydown", function (e) {
   e.preventDefault();
   if (e.key === "Enter") getAnswer();
+});
+
+document.addEventListener("keydown", function (e) {
+  e.preventDefault();
+
+  if (e.key >= 0) {
+    tabloString += e.key;
+    tablo.textContent = tabloString;
+
+    numMathCalc += e.key;
+    signsOp = "yes";
+  }
 });
