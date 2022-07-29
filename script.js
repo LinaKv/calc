@@ -7,13 +7,11 @@ const btnEqual = document.querySelector(".equal");
 
 let tabloString = " ";
 let numMathCalc = "";
-let op = "";
 let signsOp = "no";
 
 function clean() {
   tabloString = " ";
   numMathCalc = "";
-  op = "";
   tablo.textContent = "Let's start!";
   signsOp = "no";
 }
